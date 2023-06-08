@@ -6,17 +6,18 @@
 #include <functional>
 #include <sstream>
 #include <map>
+
 #include "block.h"
+
 using namespace std;
 
 template<typename T>
 class Blockchain{
 private:
     map<size_t, Block<T>*> block_map;
-    ChainHash<int, Record*> unconfirmed_records;
     string string_records;
 
-    Block<T>* last_block;
+    Block<Record>* last_block;
 
     int record_index;
     int block_index;
@@ -24,51 +25,46 @@ private:
 
 public:
     Blockchain() {
-        block_size = 10;
+        block_size = 2;
         block_index = 0;
         record_index = 0;
         string_records = "";
     };
     void addRecord(Record* new_record);
-    void addBlock(Block<T> new_block);
-    T getBlock(size_t hash_code);
+    void addBlock(Block<Record>* new_block);
+    void mine(Block<Record>* block);
+    int getBlockSize();
+    Block<T> getBlock(int block_index);
 };
 
-template <typename T>
-void Blockchain<T>::addRecord(Record new_record) {
-    unconfirmed_records.insert(make_pair(record_index, new_record));
-    string_records.append(new_record->full_data());
-
-    if (record_index + 1 == block_size) {
-        Block<Record>* block = new Block<Record>();
-        block->insert(block_index, unconfirmed_records, last_block->getPreviousHashCode(), string_records);
-        block->generateHash();
-        record_index = 0;
-        block_index += 1;
-        string_records = "";
-    } else {
-        record_index += 1;
-    }
-}
 
 template <typename T>
-void Blockchain<T>::addBlock(Block<T> new_block) {
-    if (!block_map.empty() && block_map.rbegin()->second->getHashCode() != new_block.getHashCode()) {
-        cout << "Error: El hash_code del nuevo bloque no coincide con el bloque anterior." << endl;
-        return;
-    }
-
-    block_map[block_index] = new Block<T>(new_block);
-    last_block = new_block;
-    record_index = 0;
-}
-
-template <typename T>
-T Blockchain<T>::getBlock(size_t hash_code) {
-    auto it = block_map.find(hash_code);
+Block<T> Blockchain<T>::getBlock(int block_index) {
+    auto it = block_map.find(block_index);
     if (it != block_map.end()) {
         return it->second;
     }
     return nullptr;
+}
+
+template <typename T>
+int Blockchain<T>::getBlockSize() {
+  return block_size;
+}
+
+template <typename T>
+void Blockchain<T>::mine(Block<Record>* block) {
+  string previous_hash_code = last_block !=nullptr ? last_block->getHashCode() : "";
+  block->setIndex(block_index);
+  block->setPreviousHashCode(previous_hash_code);
+  block->proofOfWork();
+
+  last_block = block;
+  block_index += 1;
+
+  cout << "ID " << block->getIndex() << endl;
+  cout << "PreviousHashCode " << block->getPreviousHashCode() << endl;
+  cout << "CurrentHashCode " << block->getHashCode() << endl;
+  cout << "--" << endl;
 }
 

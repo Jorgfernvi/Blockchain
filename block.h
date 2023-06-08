@@ -6,6 +6,7 @@
 #include <functional>
 #include <sstream>
 #include <map>
+#include "stl/chainhash.h"
 #include "record.h"
 
 using namespace std;
@@ -32,15 +33,26 @@ private:
     string string_records;
     string current_hash_code;
     string previous_hash_code;
+    int record_index;
+    int capacity;
 
 public:
     Block(){
         index = 0;
         nonce = 0;
         string_records = "";
+        current_hash_code = "";
         previous_hash_code = "";
-        previous_hash_code = "";
+        record_index = 0;
+        capacity = 10;
+    }
 
+    void setIndex(int index) {
+      this->index = index;
+    }
+
+    void setPreviousHashCode(string previous_hash_code) {
+      this->previous_hash_code = previous_hash_code;
     }
 
     int getIndex(){
@@ -63,12 +75,21 @@ public:
         return previous_hash_code;
     }
 
-    void insert(int index, ChainHash<int, Record*> records, string previous_hash_code, string string_records) {
-        this->index = index;
-        this->records = records;
-        this->string_records = string_records;
-        this->previous_hash_code = previous_hash_code;
+    int getSize() {
+      return record_index;
     }
+
+    int getCapacity() {
+      return capacity;
+    }
+
+    void insert(Record* new_record) {
+        records.insert(make_pair(record_index, new_record));
+        string_records.append(new_record->full_data());
+
+        record_index += 1;
+    }
+
 
     // HASH CODE
 
@@ -161,21 +182,20 @@ public:
         return ss.str();
     }
 
-    void generateHash() {
-        int timestamp = 1622152949;
-        std::string pattern = "10004"; //Patron inicial para todos los hash
+    void proofOfWork() {
+        std::string pattern = "00"; //Patron inicial para todos los hash
 
         int nonce = 0;
-        std::string block_hash;
+        std::string computed_hash;
         do {
-            std::string data = string_records;
-            block_hash = sha256(data);
+            std::string data = string_records.append(to_string(nonce));
+            computed_hash = sha256(data);
             nonce++;
-        } while (block_hash.substr(0, pattern.length()) != pattern);
+        } while (computed_hash.find(pattern));
 
-        std::cout << "Nonce encontrado: " << nonce << std::endl; //Se debe actualizar al bloque
-        std::cout << "Hash del bloque: " << block_hash << std::endl; //Se debe actualizar al bloque
+        // std::cout << "Nonce encontrado: " << nonce << std::endl; //Se debe actualizar al bloque
+        // std::cout << "Hash del bloque: " << block_hash << std::endl; //Se debe actualizar al bloque
         this->nonce = nonce;
-        this->current_hash_code = block_hash;
+        this->current_hash_code = computed_hash;
     }
 };

@@ -80,6 +80,16 @@ public:
       this->array = new_array;
       this->capacity = new_capacity;
     }
+
+    string search(string remitente){
+      size_t hashcode = hasher(remitente);
+      int index = hashcode % capacity;
+  
+      for(auto it = array[index].begin(); it != array[index].end(); it++){
+        cout<< it->second;
+      }
+      return ""; 
+    }
     
     typename forward_list<pair<TK,TV>>::iterator begin(int index){
       return array[index].begin();

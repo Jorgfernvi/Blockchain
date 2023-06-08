@@ -16,7 +16,7 @@ struct Record {
 
     string full_data() {
         std::ostringstream ss;
-        ss << remitente << " " << destinatario << to_string(monto) << fecha;
+        ss << remitente << " " << destinatario << " " << to_string(monto) << " " << fecha;
         return ss.str();
     };
 };
