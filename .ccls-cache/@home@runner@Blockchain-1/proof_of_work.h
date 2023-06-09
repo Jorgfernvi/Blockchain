@@ -107,22 +107,8 @@ std::string sha256(const std::string& input) {
     return ss.str();
 }
 
-int main(int argc, char **argv) {
-    // Crear una instancia de la clase Bloque
-    int numero_bloque = 1;
-    double nonce = 0.0;
-    Registro<int> datos; // Supongamos que Registro es una clase con tipo de dato int
-    size_t previous_hash_code = 12345; // Supongamos un valor de hash previo
-    Block<int> miBloque(numero_bloque, nonce, datos, previous_hash_code);
 
-    // Llamar a la función pasando el objeto Bloque como parámetro
-    actualizarNonce(miBloque);
-
-    return 0;
-}
-
-
-void actualizarNonce(Block<int>& bloque) {
+void generateHash(Block<TK>* bloque) {
    //Como añadir el bloque a la funcion :c
     std::string prev_block = bloque.getPreviousHashCode(); //Contiene el hash anterior
     std::string merkle_root = bloque.getHashCode(); //Contiene el hash actual
@@ -142,5 +128,39 @@ void actualizarNonce(Block<int>& bloque) {
 
     std::cout << "Nonce encontrado: " << nonce << std::endl; //Se debe actualizar al bloque
     std::cout << "Hash del bloque: " << block_hash << std::endl; //Se debe actualizar al bloque
-
 }
+
+
+// int main() {
+//     // Datos del bloque
+//     int version = 1;
+//     std::string prev_block = "0000000000000000000000000000000000000000000000000000000000000000";
+//     std::string merkle_root = "6dcd83d15efad1c376cd9a42a1694c0dc3e7498c6634b7a0414f4a285b7b5c77";
+//     int timestamp = 1622152949;
+//     std::string pattern = "10000";  // Patrón inicial deseado
+
+//     // Bucle de minería
+//     int nonce = 0;
+//     std::string block_hash;
+//     do {
+//         // Construir los datos del bloque con el nonce actualizado
+//         std::stringstream ss;
+//         ss << version << prev_block << merkle_root << timestamp << nonce;
+//         std::string data = ss.str();
+
+//         // Calcular el hash del bloque utilizando SHA-256
+//         block_hash = sha256(data);
+//         // Verificar si el hash del bloque cumple con el patrón inicial
+//         if (block_hash.substr(0, pattern.length()) == pattern) {
+//             break;
+//         }
+//         // Actualizar el nonce para el próximo intento
+//         nonce++;
+//     } while (true);
+//     // Imprimir el resultado
+//     std::cout << "Nonce encontrado: " << nonce << std::endl;
+//     std::cout << "Hash del bloque: " << block_hash << std::endl;
+//     return 0;
+// }
+
+

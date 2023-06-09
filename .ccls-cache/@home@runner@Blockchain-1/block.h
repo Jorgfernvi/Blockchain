@@ -90,7 +90,21 @@ public:
         record_index += 1;
     }
 
-
+  Record* getRecord(int record_index) {
+      int count = 0;
+      for (int i = 0; i < capacity; i++) {
+          auto it = records.begin(i);
+          auto end = records.end(i);
+          while (it != end) {
+              if (count == record_index) {
+                  return it->second;
+              }
+              ++it;
+              ++count;
+          }
+      }
+      return nullptr;
+  }
     // HASH CODE
 
     constexpr inline unsigned int RotateRight(unsigned int value,     unsigned int n) {

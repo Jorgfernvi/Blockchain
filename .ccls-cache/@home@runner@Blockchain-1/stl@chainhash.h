@@ -98,4 +98,50 @@ public:
     typename forward_list<pair<TK,TV>>::iterator end(int index){
       return array[index].end();
     }
+
+    typename forward_list<pair<TK, TV>>::iterator find(const TK& key) {
+      size_t hashcode = hasher(key);
+      int index = hashcode % capacity;
+  
+      for (auto it = array[index].begin(); it != array[index].end(); it++) {
+          if (it->first == key) {
+              return it;
+          }
+      }
+  
+      return array[index].end();
+    }
+
+    void searchByRemitente(const TK& remitente) {
+        size_t hashcode = hasher(remitente);
+        int index = hashcode % capacity;
+
+        for (auto it = array[index].begin(); it != array[index].end(); ++it) {
+            if (it->first == remitente) {
+                cout << "Registros encontrados para el remitente: " << remitente << endl;
+                cout << "Remitente: " << it->second->remitente << endl;
+                cout << "Destinatario: " << it->second->destinatario << endl;
+                cout << "Monto: " << it->second->monto << endl;
+                cout << "Fecha: " << it->second->fecha << endl;
+                cout << "------------------------" << endl;
+            }
+        }
+    }
+
+ void searchByDestinatario(const TK& destinatario) {
+        for (int i = 0; i < capacity; ++i) {
+            for (auto it = array[i].begin(); it != array[i].end(); ++it) {
+                if (it->second->destinatario == destinatario) {
+                    cout << "Registros encontrados para el destinatario: " << destinatario << endl;
+                    cout << "Remitente: " << it->second->remitente << endl;
+                    cout << "Destinatario: " << it->second->destinatario << endl;
+                    cout << "Monto: " << it->second->monto << endl;
+                    cout << "Fecha: " << it->second->fecha << endl;
+                    cout << "------------------------" << endl;
+                }
+            }
+        }
+    }
 };
+
+

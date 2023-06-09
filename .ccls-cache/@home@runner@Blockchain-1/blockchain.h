@@ -35,6 +35,15 @@ public:
     void mine(Block<Record>* block);
     int getBlockSize();
     Block<T> getBlock(int block_index);
+    void searchByAmountRange(double min_amount, double max_amount);
+    Record* getRecord(int block_index, int record_index);
+    void searchByDateRange(const string& min_date, const string& max_date);
+    //Record* getRecord(int block_index, int record_index);
+    bool isDateInRange(const string& date, const string& min_date, const string& max_date);
+    tm parseDate(const string& date);
+    void searchByRemitente(const string& remitente);
+    void searchByDestinatario(const string& destinatario);
+
 };
 
 
@@ -68,3 +77,114 @@ void Blockchain<T>::mine(Block<Record>* block) {
   cout << "--" << endl;
 }
 
+template <typename T>
+void Blockchain<T>:: addBlock(Block<Record>* new_block) {
+  mine(new_block);
+  
+  block_map[new_block->getIndex()] = new_block;
+}
+
+template <typename T>
+void Blockchain<T>::searchByAmountRange(double min_amount, double max_amount) {
+    cout << "Registros encontrados en el rango de monto $" << min_amount << " - $" << max_amount << ":" << endl;
+
+    for (const auto& block_pair : block_map) {
+        Block<Record>* block = block_pair.second;
+
+        for (int i = 0; i < block->getSize(); i++) {
+            Record* record = block->getRecord(i);
+            if (record->monto >= min_amount && record->monto <= max_amount) {
+                cout << "Remitente: " << record->remitente << endl;
+                cout << "Destinatario: " << record->destinatario << endl;
+                cout << "Monto: " << record->monto << endl;
+                cout << "Fecha: " << record->fecha << endl;
+                cout << "------------------------" << endl;
+            }
+        }
+    }
+}
+
+template <typename T>
+void Blockchain<T>::searchByDateRange(const string& min_date, const string& max_date) {
+    cout << "Registros encontrados en el rango de fechas " << min_date << " - " << max_date << ":" << endl;
+
+    for (const auto& block_pair : block_map) {
+        Block<Record>* block = block_pair.second;
+
+        for (int i = 0; i < block->getSize(); i++) {
+            Record* record = block->getRecord(i);
+            if (isDateInRange(record->fecha, min_date, max_date)) {
+                cout << "Remitente: " << record->remitente << endl;
+                cout << "Destinatario: " << record->destinatario << endl;
+                cout << "Monto: " << record->monto << endl;
+                cout << "Fecha: " << record->fecha << endl;
+                cout << "------------------------" << endl;
+            }
+        }
+    }
+}
+
+template <typename T>
+bool Blockchain<T>::isDateInRange(const string& date, const string& min_date, const string& max_date) {
+    tm min_tm = parseDate(min_date);
+    tm max_tm = parseDate(max_date);
+    tm record_tm = parseDate(date);
+
+    // Convertir las fechas a formato time_t para realizar la comparación
+    time_t min_time = mktime(&min_tm);
+    time_t max_time = mktime(&max_tm);
+    time_t record_time = mktime(&record_tm);
+
+    if (record_time >= min_time && record_time <= max_time) {
+        return true;
+    }
+    return false;
+}
+
+template <typename T>
+tm Blockchain<T>::parseDate(const string& date) {
+    tm tm_date = {};
+    stringstream ss(date);
+    ss >> get_time(&tm_date, "%m/%d/%Y");
+    return tm_date;
+}
+
+template <typename T>
+void Blockchain<T>::searchByRemitente(const string& remitente) {
+    cout << "Registros encontrados para el remitente \"" << remitente << "\":" << endl;
+
+    for (const auto& block_pair : block_map) {
+        Block<Record>* block = block_pair.second;
+
+        for (int i = 0; i < block->getSize(); i++) {
+            Record* record = block->getRecord(i);
+            if (record->remitente == remitente) {
+                cout << "Remitente: " << record->remitente << endl;
+                cout << "Destinatario: " << record->destinatario << endl;
+                cout << "Monto: " << record->monto << endl;
+                cout << "Fecha: " << record->fecha << endl;
+                cout << "------------------------" << endl;
+            }
+        }
+    }
+}
+
+template <typename T>
+void Blockchain<T>::searchByDestinatario(const string& destinatario) {
+    cout << "Registros encontrados para el destinatario \"" << destinatario << "\":" << endl;
+
+    for (const auto& block_pair : block_map) {
+        Block<Record>* block = block_pair.second;
+
+        for (int i = 0; i < block->getSize(); i++) {
+            Record* record = block->getRecord(i);
+            if (record->destinatario == destinatario) {
+                cout << "Remitente: " << record->remitente << endl;
+                cout << "Destinatario: " << record->destinatario << endl;
+                cout << "Monto: " << record->monto << endl;
+                cout << "Fecha: " << record->fecha << endl;
+                cout << "------------------------" << endl;
+            }
+        }
+    }
+}
